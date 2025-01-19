@@ -32,8 +32,9 @@ RUN if [ -z "${TARGETARCH}" ]; then TARGETARCH="amd64"; fi \
 && apk add --no-cache \
   py3-pip \
   curl \
-&& cat apk-packages.blacklist \
- | xargs apk add --no-cache \
+&& curl -L https://github.com/TuanAnh17N/cc-utils/raw/master/gardener-cicd-libs.apk-packages \
+    | grep -v -f apk-packages.blacklist \
+    | xargs apk add --no-cache \
 && mkdir -p $HOME/.config/pip \
 && echo -e "[global]\nbreak-system-packages = true" >> $HOME/.config/pip/pip.conf \
 && pip3 install --upgrade --no-cache-dir \

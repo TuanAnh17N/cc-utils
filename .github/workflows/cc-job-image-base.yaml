@@ -34,7 +34,7 @@ jobs:
         name: Build and Publish CC-Job-Image-Base
         uses: docker/build-push-action@v6
         with:
-          push: false
+          push: true
           platforms: ${{ env.platforms }}
           tags: ghcr.io/test/cc-utils/job-image-base:latest
           file: Dockerfile.job-image-base
