@@ -32,7 +32,7 @@ RUN if [ -z "${TARGETARCH}" ]; then TARGETARCH="amd64"; fi \
 && apk add --no-cache \
   py3-pip \
   curl \
-&& curl -L https://github.com/TuanAnh17N/cc-utils/raw/master/gardener-cicd-libs.apk-packages \
+&& cat gardener-cicd-libs.apk-packages \
     | grep -v -f apk-packages.blacklist \
     | xargs apk add --no-cache \
 && mkdir -p $HOME/.config/pip \
