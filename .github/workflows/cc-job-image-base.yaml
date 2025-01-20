@@ -31,12 +31,13 @@ jobs:
           registry: ghcr.io
 
       - name: Set lowercase repository owner
-        run: echo "REPO_OWNER_LOWER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+        id: repo_owner_lower
+        run: echo "::set-output name=lower_repo_owner::$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')"
 
       - name: Build and Publish CC-Job-Image-Base
         uses: docker/build-push-action@v6
         with:
           push: true
           platforms: ${{ env.platforms }}
-          tags: ghcr.io/${{ github.repository_owner }}/cc-utils/job-image-base:latest
+          tags: ghcr.io/${{ steps.repo_owner_lower.outputs.lower_repo_owner }}/cc-utils/job-image-base:latest
           file: Dockerfile.job-image-base
