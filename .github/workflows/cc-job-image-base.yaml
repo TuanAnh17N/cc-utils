@@ -36,5 +36,5 @@ jobs:
         with:
           push: true
           platforms: ${{ env.platforms }}
-          tags: ghcr.io/test/cc-utils/job-image-base:latest
+          tags: ghcr.io/${{ github.repository_owner }}/cc-utils/job-image-base:latest
           file: Dockerfile.job-image-base
