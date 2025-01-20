@@ -1,3 +1,18 @@
+FROM alpine:3 as builder
+
+COPY gardener-cicd-libs.apk-packages .
+COPY requirements.txt .
+
+RUN apk add --no-cache \
+  curl \
+&& cat gardener-cicd-libs.apk-packages | xargs apk add --no-cache \
+&& mkdir -p $HOME/.config/pip \
+&& echo -e "[global]\nbreak-system-packages = true" >> $HOME/.config/pip/pip.conf \
+&& pip3 install --upgrade --no-cache-dir \
+   pip \
+&& pip3 install --root /pkgs --upgrade --no-cache-dir \
+   $(grep -v '#' requirements.txt | grep -v 'gardener' | tr '\n' ' ')
+
 FROM alpine:3
 
 
@@ -8,13 +23,16 @@ ARG TARGETARCH
 
 ENV DOCKER_BUILDX_VERSION=v0.19.3
 
+COPY apk-packages.blacklist .
+COPY --from=builder /pkgs/usr /usr
+
 RUN if [ -z "${TARGETARCH}" ]; then TARGETARCH="amd64"; fi \
 &&  if [ "${TARGETARCH}" == "arm64" ]; then DOCKER_ARCH="aarch64"; \
       elif [ "${TARGETARCH}" == "amd64" ]; then DOCKER_ARCH="x86_64"; fi \
 && apk add --no-cache \
   py3-pip \
   curl \
-&& cat gardener-cicd-libs.apk-packages \
+&& curl -L https://github.com/TuanAnh17N/cc-utils/raw/master/gardener-cicd-libs.apk-packages \
     | grep -v -f apk-packages.blacklist \
     | xargs apk add --no-cache \
 && mkdir -p $HOME/.config/pip \
