@@ -30,8 +30,10 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
 
-      -
-        name: Build and Publish CC-Job-Image-Base
+      - name: Set lowercase repository owner
+        run: echo "REPO_OWNER_LOWER=$(echo ${{ github.repository_owner }} | tr '[:upper:]' '[:lower:]')" >> $GITHUB_ENV
+
+      - name: Build and Publish CC-Job-Image-Base
         uses: docker/build-push-action@v6
         with:
           push: true
