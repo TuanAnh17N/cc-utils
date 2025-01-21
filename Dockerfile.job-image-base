@@ -17,11 +17,11 @@ FROM alpine:3
 
 
 ENV DOCKER_CHANNEL=stable
-ENV DOCKER_VERSION=27.4.1
+ENV DOCKER_VERSION=27.5.0
 ENV PATH=$PATH:/opt/docker
 ARG TARGETARCH
 
-ENV DOCKER_BUILDX_VERSION=v0.19.3
+ENV DOCKER_BUILDX_VERSION=v0.20.0-rc3
 
 COPY apk-packages.blacklist .
 COPY --from=builder /pkgs/usr /usr
