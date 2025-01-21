@@ -10,6 +10,7 @@ jobs:
     environment: build
     permissions:
       contents: write
+      pull-requests: write
       packages: write
     env:
       platforms: linux/amd64,linux/arm64
