@@ -41,14 +41,18 @@ jobs:
 
       - name: Set lowercase repository owner
         id: repo_owner_lower
-        run: echo "::set-output name=lower_repo_owner::$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')"
+        run: |
+          echo "::set-output name=lower_repo_owner::$(echo '${{ github.repository_owner }}' \
+          | tr '[:upper:]' '[:lower:]')"
 
       - name: Build and Publish CC-Job-Image-Base
         uses: docker/build-push-action@v6
         with:
           push: true
           platforms: ${{ env.platforms }}
-          tags: ghcr.io/${{ steps.repo_owner_lower.outputs.lower_repo_owner }}/cc-utils/job-image-base:latest
+          tags: |
+            ghcr.io/${{ steps.repo_owner_lower.outputs.lower_repo_owner }}/cc-utils/
+            job-image-base:latest
           file: Dockerfile.job-image-base
 
       - name: Get latest Docker version
@@ -78,10 +82,13 @@ jobs:
 
       - name: Update Dockerfile with latest versions
         run: |
-          sed -i "s/DOCKER_VERSION=.*/DOCKER_VERSION=${{ env.DOCKER_VERSION }}/" Dockerfile.job-image-base
-          sed -i "s/DOCKER_BUILDX_VERSION=.*/DOCKER_BUILDX_VERSION=${{ env.BUILDX_VERSION }}/" Dockerfile.job-image-base
+          sed -i "s/DOCKER_VERSION=.*/DOCKER_VERSION=${{ env.DOCKER_VERSION }}/" \
+          Dockerfile.job-image-base
+          sed -i "s/DOCKER_BUILDX_VERSION=.*/DOCKER_BUILDX_VERSION=${{ env.BUILDX_VERSION }}/" \
+          Dockerfile.job-image-base
           git add Dockerfile.job-image-base
-          git commit -m "Update Dockerfile to use Docker ${{ env.DOCKER_VERSION }} and Buildx ${{ env.BUILDX_VERSION }}"
+          git commit -m "Update Dockerfile to use Docker ${{ env.DOCKER_VERSION }} and \
+          Buildx ${{ env.BUILDX_VERSION }}"
           git checkout -b update-dockerfile
           git push origin update-dockerfile
 
@@ -91,6 +98,9 @@ jobs:
             -B master \
             -H update-dockerfile \
             --title "Update Dockerfile with latest Docker and Buildx versions" \
-            --body "This PR updates the Dockerfile to use the latest versions:\n\n- Docker: `${{ env.DOCKER_VERSION }}`\n- Buildx: `${{ env.BUILDX_VERSION }}`."
+            --body |
+              This PR updates the Dockerfile to use the latest versions:
+              - Docker: `${{ env.DOCKER_VERSION }}`
+              - Buildx: `${{ env.BUILDX_VERSION }}`
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
