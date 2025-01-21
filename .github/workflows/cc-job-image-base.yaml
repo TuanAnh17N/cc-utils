@@ -50,7 +50,7 @@ jobs:
         with:
           push: true
           platforms: ${{ env.platforms }}
-          tags: |
+          tags: >
             ghcr.io/${{ steps.repo_owner_lower.outputs.lower_repo_owner }}/cc-utils/
             job-image-base:latest
           file: Dockerfile.job-image-base
