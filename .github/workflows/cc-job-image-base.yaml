@@ -80,7 +80,8 @@ jobs:
           sed -i "s/DOCKER_VERSION=.*/DOCKER_VERSION=${{ env.DOCKER_VERSION }}/" Dockerfile.job-image-base
           sed -i "s/DOCKER_BUILDX_VERSION=.*/DOCKER_BUILDX_VERSION=${{ env.BUILDX_VERSION }}/" Dockerfile.job-image-base
           git add Dockerfile.job-image-base
-          git commit -m "Update Dockerfile to use Docker ${DOCKER_VERSION} and Buildx ${BUILDX_VERSION}"
+          git commit -m "Update Dockerfile to use Docker ${{ env.DOCKER_VERSION }} and Buildx ${{ env.BUILDX_VERSION }}"
+          git checkout -b update-dockerfile
           git push origin update-dockerfile
 
       - name: Create Pull Request
