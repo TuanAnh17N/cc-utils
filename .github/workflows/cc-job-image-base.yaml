@@ -96,9 +96,8 @@ jobs:
             -B master \
             -H update-dockerfile \
             --title "Update Dockerfile with latest Docker and Buildx versions" \
-            --body |
-              This PR updates the Dockerfile to use the latest versions:
+            --body "This PR updates the Dockerfile to use the latest versions:
               - Docker: `${{ env.DOCKER_VERSION }}`
-              - Buildx: `${{ env.BUILDX_VERSION }}`
+              - Buildx: `${{ env.BUILDX_VERSION }}`"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
