@@ -102,7 +102,7 @@ jobs:
             -H update-dockerfile \
             --title "Update Dockerfile with latest Docker and Buildx versions" \
             --body "Updates the Dockerfile to use the latest versions:
-              - Docker: \`${{ needs.build-and-push.outputs.docker_version }}\`\n\
-              - Buildx: \`${{ needs.build-and-push.outputs.buildx_version }}\`"
+              - Docker: `${{ needs.build-and-push.outputs.docker_version }}`
+              - Buildx: `${{ needs.build-and-push.outputs.buildx_version }}`"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
