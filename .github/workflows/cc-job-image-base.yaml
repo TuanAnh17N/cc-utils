@@ -61,13 +61,13 @@ jobs:
             | head -1)
           echo "buildx_version=$greatest_version" >> $GITHUB_OUTPUT
 
-      - name: Build and Push Base Image
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/${{ steps.repo_owner_lower.outputs.lower_repo_owner }}/cc-utils/job-image-base:latest
-          file: Dockerfile.job-image-base
+      # - name: Build and Push Base Image
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     push: true
+      #     platforms: linux/amd64,linux/arm64
+      #     tags: ghcr.io/${{ steps.repo_owner_lower.outputs.lower_repo_owner }}/cc-utils/job-image-base:latest
+      #     file: Dockerfile.job-image-base
 
   update-dockerfile:
     needs: build-and-push
@@ -92,6 +92,7 @@ jobs:
           git add Dockerfile.job-image-base
           git commit -m "Update Dockerfile to use Docker ${{ needs.build-and-push.outputs.docker_version }} and \
           Buildx ${{ needs.build-and-push.outputs.buildx_version }}"
+          git checkout -b update-dockerfile
           git push origin update-dockerfile --force
 
       - name: Create Pull Request
