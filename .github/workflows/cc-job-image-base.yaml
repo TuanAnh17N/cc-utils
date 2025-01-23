@@ -7,8 +7,10 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       packages: write
+    outputs:
+      version: ${{ steps.read_version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -34,16 +36,21 @@ jobs:
           lower_repo_owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')
           echo "lower_repo_owner=$lower_repo_owner" >> $GITHUB_OUTPUT
 
+      - name: Read Version from File
+        id: read_version
+        run: |
+          version=$(cat VERSION_CC_JOB_IMAGE_BASE)
+          echo "version=$version" >> $GITHUB_OUTPUT
+
       - name: Build and Push Base Image
         uses: docker/build-push-action@v6
         with:
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/${{ steps.repo_owner_lower.outputs.lower_repo_owner }}/cc-utils/job-image-base:latest
+          tags: ghcr.io/${{ steps.repo_owner_lower.outputs.lower_repo_owner }}/cc-utils/job-image-base:${{ steps.read_version.outputs.version }}
           file: Dockerfile.job-image-base
 
   update-dockerfile:
-    needs: build-and-push
     runs-on: ubuntu-latest
     permissions:
       contents: write
