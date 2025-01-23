@@ -6,14 +6,9 @@ on:
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    environment: build
     permissions:
       contents: write
       packages: write
-    outputs:
-      docker_version: ${{ steps.get_docker_version.outputs.docker_version }}
-      buildx_version: ${{ steps.get_buildx_version.outputs.buildx_version }}
-      lower_repo_owner: ${{ steps.repo_owner_lower.outputs.lower_repo_owner }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -39,6 +34,33 @@ jobs:
           lower_repo_owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')
           echo "lower_repo_owner=$lower_repo_owner" >> $GITHUB_OUTPUT
 
+      - name: Build and Push Base Image
+        uses: docker/build-push-action@v6
+        with:
+          push: true
+          platforms: linux/amd64,linux/arm64
+          tags: ghcr.io/${{ steps.repo_owner_lower.outputs.lower_repo_owner }}/cc-utils/job-image-base:latest
+          file: Dockerfile.job-image-base
+
+  update-dockerfile:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    outputs:
+      docker_version: ${{ steps.get_docker_version.outputs.docker_version }}
+      buildx_version: ${{ steps.get_buildx_version.outputs.buildx_version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Git Identity
+        run: |
+          git config --global --add safe.directory $PWD
+          git config --global user.name 'Gardener-CICD Bot'
+          git config --global user.email 'gardener.ci.user@gmail.com'
+
       - name: Get latest Docker version
         id: get_docker_version
         run: |
@@ -61,37 +83,13 @@ jobs:
             | head -1)
           echo "buildx_version=$greatest_version" >> $GITHUB_OUTPUT
 
-      - name: Build and Push Base Image
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/${{ steps.repo_owner_lower.outputs.lower_repo_owner }}/cc-utils/job-image-base:latest
-          file: Dockerfile.job-image-base
-
-  update-dockerfile:
-    needs: build-and-push
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-      pull-requests: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Git Identity
-        run: |
-          git config --global --add safe.directory $PWD
-          git config --global user.name 'Gardener-CICD Bot'
-          git config --global user.email 'gardener.ci.user@gmail.com'
-
       - name: Update Dockerfile
         run: |
-          sed -i "s/DOCKER_VERSION=.*/DOCKER_VERSION=${{ needs.build-and-push.outputs.docker_version }}/" Dockerfile.job-image-base
-          sed -i "s/DOCKER_BUILDX_VERSION=.*/DOCKER_BUILDX_VERSION=${{ needs.build-and-push.outputs.buildx_version }}/" Dockerfile.job-image-base
+          sed -i "s/DOCKER_VERSION=.*/DOCKER_VERSION=${{ steps.get_docker_version.outputs.docker_version }}/" Dockerfile.job-image-base
+          sed -i "s/DOCKER_BUILDX_VERSION=.*/DOCKER_BUILDX_VERSION=${{ steps.get_buildx_version.outputs.buildx_version }}/" Dockerfile.job-image-base
           git add Dockerfile.job-image-base
-          git commit -m "Update Dockerfile to use Docker ${{ needs.build-and-push.outputs.docker_version }} and \
-          Buildx ${{ needs.build-and-push.outputs.buildx_version }}"
+          git commit -m "Update Dockerfile to use Docker ${{ steps.get_docker_version.outputs.docker_version }} and \
+          Buildx ${{ steps.get_buildx_version.outputs.buildx_version }}"
           git checkout -b update-dockerfile
           git push origin update-dockerfile --force
 
@@ -102,7 +100,7 @@ jobs:
             -H update-dockerfile \
             --title "Update Dockerfile with latest Docker and Buildx versions" \
             --body "Updates the Dockerfile to use the latest versions:
-              - Docker: `${{ needs.build-and-push.outputs.docker_version }}`
-              - Buildx: `${{ needs.build-and-push.outputs.buildx_version }}`"
+              - Docker: `${{ steps.get_docker_version.outputs.docker_version }}`
+              - Buildx: `${{ steps.get_buildx_version.outputs.buildx_version }}`"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
