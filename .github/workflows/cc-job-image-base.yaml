@@ -120,10 +120,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-        with:
-          repository: <owner>/<job-image-repo>
-          token: ${{ secrets.GITHUB_TOKEN }}
-          path: job-image-repo
 
       - name: Setup Git Identity
         run: |
@@ -141,7 +137,6 @@ jobs:
           new_version=$(echo $current_version | awk -F. '{printf "%d.%d.%d", $1, $2+1, $3}')
           echo "$new_version" > job-image-repo/VERSION_CC_JOB_IMAGE_BASE
 
-          # Commit und Push
           git add Dockerfile VERSION_CC_JOB_IMAGE_BASE
           git commit -m "Update job-image to use job-image-base version $current_version and prepare for $new_version"
           git checkout -b update-base-image
