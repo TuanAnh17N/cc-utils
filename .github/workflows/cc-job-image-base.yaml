@@ -119,7 +119,6 @@ jobs:
       pull-requests: write
     outputs:
       new_version: ${{ steps.update_version.outputs.new_version }}
-      current_version: ${{ steps.update_version.outputs.current_version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -133,11 +132,10 @@ jobs:
       - name: Update Base Image and Increment Version
         id: update_version
         run: |
-          sed -i "s|^ARG BASE_IMAGE=.*|ARG BASE_IMAGE=ghcr.io/${{ github.repository_owner }}/cc-utils/job-image-base:${{ needs.build-and-push.outputs.version }}|" Dockerfile
+          current_version=${{ needs.build-and-push.outputs.version }}
+          sed -i "s|^ARG BASE_IMAGE=.*|ARG BASE_IMAGE=ghcr.io/${{ github.repository_owner }}/cc-utils/job-image-base:$current_version|" Dockerfile
         
-          current_version=$(cat VERSION_CC_JOB_IMAGE_BASE)
           new_version=$(echo $current_version | awk -F. '{printf "%d.%d.%d", $1, $2+1, $3}')
-          echo "current_version=$current_version" >> $GITHUB_OUTPUT
           echo "new_version=$new_version" >> $GITHUB_OUTPUT
           echo "$new_version" > VERSION_CC_JOB_IMAGE_BASE
 
@@ -151,9 +149,9 @@ jobs:
           gh pr create \
             -B master \
             -H update-base-image \
-            --title "Update job-image to use job-image-base version ${{ needs.build-and-push.outputs.version }}" \
+            --title "Update job-image to use job-image-base version $current_version" \
             --body "Updates the job-image to use the latest job-image-base version:
-              - Base Image Version: ${{ needs.build-and-push.outputs.version }}.
+              - Base Image Version: $current_version.
               - Also increments the version for the next release to ${{ steps.update_version.outputs.new_version }}."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
