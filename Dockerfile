@@ -1,4 +1,4 @@
-ARG BASE_IMAGE=ghcr.io/tuananh17n/cc-utils/job-image-base:0.104.0
+ARG BASE_IMAGE=ghcr.io/TuanAnh17N/cc-utils/job-image-base:0.105.0
 FROM $BASE_IMAGE AS builder
 COPY VERSION /metadata/VERSION
 COPY . /cc/utils/
