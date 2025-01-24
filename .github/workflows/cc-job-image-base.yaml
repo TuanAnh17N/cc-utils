@@ -121,11 +121,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      # - name: Setup Git Identity
-      #   run: |
-      #     git config --global --add safe.directory $PWD
-      #     git config --global user.name 'Gardener-CICD Bot'
-      #     git config --global user.email 'gardener.ci.user@gmail.com'
+      - name: Setup Git Identity
+        run: |
+          git config --global --add safe.directory $PWD
+          git config --global user.name 'Gardener-CICD Bot'
+          git config --global user.email 'gardener.ci.user@gmail.com'
 
       - name: Update Base Image and Increment Version
         id: update_version
