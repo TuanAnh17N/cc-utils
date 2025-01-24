@@ -42,13 +42,13 @@ jobs:
           version=$(cat VERSION_CC_JOB_IMAGE_BASE)
           echo "version=$version" >> $GITHUB_OUTPUT
 
-      - name: Build and Push Base Image
-        uses: docker/build-push-action@v6
-        with:
-          push: true
-          platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/${{ steps.repo_owner_lower.outputs.lower_repo_owner }}/cc-utils/job-image-base:${{ steps.read_version.outputs.version }}
-          file: Dockerfile.job-image-base
+      # - name: Build and Push Base Image
+      #   uses: docker/build-push-action@v6
+      #   with:
+      #     push: true
+      #     platforms: linux/amd64,linux/arm64
+      #     tags: ghcr.io/${{ steps.repo_owner_lower.outputs.lower_repo_owner }}/cc-utils/job-image-base:${{ steps.read_version.outputs.version }}
+      #     file: Dockerfile.job-image-base
 
   update-dockerfile:
     runs-on: ubuntu-latest
@@ -121,11 +121,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Git Identity
-        run: |
-          git config --global --add safe.directory $PWD
-          git config --global user.name 'Gardener-CICD Bot'
-          git config --global user.email 'gardener.ci.user@gmail.com'
+      # - name: Setup Git Identity
+      #   run: |
+      #     git config --global --add safe.directory $PWD
+      #     git config --global user.name 'Gardener-CICD Bot'
+      #     git config --global user.email 'gardener.ci.user@gmail.com'
 
       - name: Update Base Image and Increment Version
         id: update_version
