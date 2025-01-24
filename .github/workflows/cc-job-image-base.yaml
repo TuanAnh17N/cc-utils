@@ -135,7 +135,7 @@ jobs:
           sed -i "s|^ARG BASE_IMAGE=.*|ARG BASE_IMAGE=ghcr.io/${{ github.repository_owner }}/cc-utils/job-image-base:$current_version|" Dockerfile
 
           new_version=$(echo $current_version | awk -F. '{printf "%d.%d.%d", $1, $2+1, $3}')
-          echo "$new_version" > job-image-repo/VERSION_CC_JOB_IMAGE_BASE
+          echo "$new_version" > VERSION_CC_JOB_IMAGE_BASE
 
           git add Dockerfile VERSION_CC_JOB_IMAGE_BASE
           git commit -m "Update job-image to use job-image-base version $current_version and prepare for $new_version"
