@@ -13,6 +13,7 @@ runs:
   using: composite
   steps:
     - name: Set Git user identity
+      shell: bash
       run: |
         git config --global --add safe.directory $PWD
         git config --global user.name "${{ inputs.user_name }}"
