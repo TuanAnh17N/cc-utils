@@ -63,10 +63,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Git Identity
-        run: |
-          git config --global --add safe.directory $PWD
-          git config --global user.name 'Gardener-CICD Bot'
-          git config --global user.email 'gardener.ci.user@gmail.com'
+        uses: ./.github/actions/setup-git-identity
 
       - name: Get latest Docker version
         id: get_docker_version
@@ -124,10 +121,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup Git Identity
-        run: |
-          git config --global --add safe.directory $PWD
-          git config --global user.name 'Gardener-CICD Bot'
-          git config --global user.email 'gardener.ci.user@gmail.com'
+        uses: ./.github/actions/setup-git-identity
 
       - name: Update Base Image and Increment Version
         id: update_version
@@ -149,9 +143,9 @@ jobs:
           gh pr create \
             -B master \
             -H update-base-image \
-            --title "Update job-image to use job-image-base version $current_version" \
+            --title "Update job-image to use job-image-base version ${{ needs.build-and-push.outputs.version }}" \
             --body "Updates the job-image to use the latest job-image-base version:
-              - Base Image Version: $current_version.
+              - Base Image Version: ${{ needs.build-and-push.outputs.version }}.
               - Also increments the version for the next release to ${{ steps.update_version.outputs.new_version }}."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
