@@ -28,6 +28,12 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: ghcr.io
 
+      - name: Read Version
+        id: read_version
+        run: |
+          version=$(cat VERSION_CC_JOB_IMAGE_BASE)
+          echo "version=$version" >> $GITHUB_OUTPUT
+
       - name: Set lowercase repository owner
         id: repo_owner_lower
         run: |
@@ -39,7 +45,7 @@ jobs:
         with:
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/${{ steps.repo_owner_lower.outputs.lower_repo_owner }}/cc-utils/job-image-base:$(cat VERSION_CC_JOB_IMAGE_BASE)
+          tags: ghcr.io/${{ steps.repo_owner_lower.outputs.lower_repo_owner }}/cc-utils/job-image-base:${{ steps.read_version.outputs.version }}
           file: Dockerfile.job-image-base
 
   update-dockerfile:
@@ -81,15 +87,18 @@ jobs:
 
       - name: Update Dockerfile
         run: |
-          docker_version=${{ steps.get_docker_version.outputs.docker_version }}
-          buildx_version=${{ steps.get_buildx_version.outputs.buildx_version }}
-
-          sed -i "s/DOCKER_VERSION=.*/DOCKER_VERSION=$docker_version/" Dockerfile.job-image-base
-          sed -i "s/DOCKER_BUILDX_VERSION=.*/DOCKER_BUILDX_VERSION=$buildx_version/" \
+          sed -i "s/DOCKER_VERSION=.*/DOCKER_VERSION=\
+          ${{ steps.get_docker_version.outputs.docker_version }}/" Dockerfile.job-image-base
+          sed -i "s/DOCKER_BUILDX_VERSION=.*/DOCKER_BUILDX_VERSION=\
+          ${{ steps.get_buildx_version.outputs.buildx_version }}/" \
           Dockerfile.job-image-base
 
+      - name: Commit and Push Changes
+        run: |
           git add Dockerfile.job-image-base
-          git commit -m "Update Dockerfile to use Docker $docker_version and Buildx $buildx_version"
+          git commit -m "Update Dockerfile to use Docker \
+          ${{ steps.get_docker_version.outputs.docker_version }} and Buildx \
+          ${{ steps.get_buildx_version.outputs.buildx_version }}"
           git checkout -b update-dockerfile
           git push origin update-dockerfile --force
 
