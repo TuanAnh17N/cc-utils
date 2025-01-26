@@ -109,7 +109,7 @@ jobs:
               --body "Updates the Dockerfile to use the latest versions:
                 - Docker: ${{ steps.get_docker_version.outputs.docker_version }}
                 - Buildx: ${{ steps.get_buildx_version.outputs.buildx_version }}"
-          fi
+          fi || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   update-base-image-version:
@@ -154,7 +154,7 @@ jobs:
               --body "Updates the job-image to use the latest job-image-base version:
                 - Base Image Version: ${{ needs.build-and-push.outputs.version }}.
                 - Also increments the version for the next release to ${{ steps.update_version.outputs.new_version }}."
-          fi
+          fi || true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
