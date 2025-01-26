@@ -9,8 +9,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-    outputs:
-      version: ${{ steps.read_version.outputs.version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -36,18 +34,12 @@ jobs:
           lower_repo_owner=$(echo '${{ github.repository_owner }}' | tr '[:upper:]' '[:lower:]')
           echo "lower_repo_owner=$lower_repo_owner" >> $GITHUB_OUTPUT
 
-      - name: Read Version
-        id: read_version
-        run: |
-          version=$(cat VERSION_CC_JOB_IMAGE_BASE)
-          echo "version=$version" >> $GITHUB_OUTPUT
-
       - name: Build and Push Base Image
         uses: docker/build-push-action@v6
         with:
           push: true
           platforms: linux/amd64,linux/arm64
-          tags: ghcr.io/${{ steps.repo_owner_lower.outputs.lower_repo_owner }}/cc-utils/job-image-base:${{ steps.read_version.outputs.version }}
+          tags: ghcr.io/${{ steps.repo_owner_lower.outputs.lower_repo_owner }}/cc-utils/job-image-base:$(cat VERSION_CC_JOB_IMAGE_BASE)
           file: Dockerfile.job-image-base
 
   update-dockerfile:
@@ -113,13 +105,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   update-base-image-version:
-    needs: build-and-push
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
     outputs:
       new_version: ${{ steps.update_version.outputs.new_version }}
+      current_version: ${{ steps.update_version.outputs.current_version }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -136,11 +128,15 @@ jobs:
         
           new_version=$(echo $current_version | awk -F. '{printf "%d.%d.%d", $1, $2+1, $3}')
           echo "new_version=$new_version" >> $GITHUB_OUTPUT
+          echo "current_version=$current_version" >> $GITHUB_OUTPUT
           echo "$new_version" > VERSION_CC_JOB_IMAGE_BASE
-
+      
+      - name: Commit and Push Changes
+        run: |
           git add Dockerfile VERSION_CC_JOB_IMAGE_BASE
-          git commit -m "Update job-image to use job-image-base version $current_version \
-          and prepare for $new_version"
+          git commit -m "Update job-image to use job-image-base \
+          version ${{ steps.update_version.outputs.current_version }} \
+          and prepare for ${{ steps.update_version.outputs.new_version }}"
           git checkout -b update-base-image
           git push origin update-base-image --force
 
@@ -149,9 +145,9 @@ jobs:
           gh pr create \
             -B master \
             -H update-base-image \
-            --title "Update job-image to use version ${{ needs.build-and-push.outputs.version }}" \
+            --title "Update job-image to use version ${{ steps.update_version.outputs.current_version }}" \
             --body "Updates the job-image to use the latest job-image-base version:
-              - Base Image Version: ${{ needs.build-and-push.outputs.version }}.
+              - Base Image Version: ${{ steps.update_version.outputs.current_version }}.
               - Also increments the version to ${{ steps.update_version.outputs.new_version }}."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
