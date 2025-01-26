@@ -99,17 +99,13 @@ jobs:
 
       - name: Create Pull Request
         run: |
-          if gh pr view -B master -H update-dockerfile > /dev/null 2>&1; then
-            echo "Pull request already exists for update-dockerfile -> master."
-          else
-            gh pr create \
-              -B master \
-              -H update-dockerfile \
-              --title "Update Dockerfile with latest Docker and Buildx versions" \
-              --body "Updates the Dockerfile to use the latest versions:
-                - Docker: ${{ steps.get_docker_version.outputs.docker_version }}
-                - Buildx: ${{ steps.get_buildx_version.outputs.buildx_version }}"
-          fi || true
+          gh pr create \
+            -B master \
+            -H update-dockerfile \
+            --title "Update Dockerfile with latest Docker and Buildx versions" \
+            --body "Updates the Dockerfile to use the latest versions:
+              - Docker: ${{ steps.get_docker_version.outputs.docker_version }}
+              - Buildx: ${{ steps.get_buildx_version.outputs.buildx_version }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   update-base-image-version:
@@ -144,17 +140,13 @@ jobs:
 
       - name: Create Pull Request
         run: |
-          if gh pr view -B master -H update-base-image > /dev/null 2>&1; then
-            echo "Pull request already exists for update-base-image -> master."
-          else
-            gh pr create \
-              -B master \
-              -H update-base-image \
-              --title "Update job-image to use job-image-base version ${{ needs.build-and-push.outputs.version }}" \
-              --body "Updates the job-image to use the latest job-image-base version:
-                - Base Image Version: ${{ needs.build-and-push.outputs.version }}.
-                - Also increments the version for the next release to ${{ steps.update_version.outputs.new_version }}."
-          fi || true
+          gh pr create \
+            -B master \
+            -H update-base-image \
+            --title "Update job-image to use job-image-base version ${{ needs.build-and-push.outputs.version }}" \
+            --body "Updates the job-image to use the latest job-image-base version:
+              - Base Image Version: ${{ needs.build-and-push.outputs.version }}.
+              - Also increments the version for the next release to ${{ steps.update_version.outputs.new_version }}."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
