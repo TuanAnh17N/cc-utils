@@ -80,7 +80,7 @@ jobs:
       - name: Get latest Buildx version
         id: get_buildx_version
         run: |
-          greatest_version=$(curl -sL https://api.github.com/repos/docker/buildx/releases/ \
+          greatest_version=$(curl -sL https://api.github.com/repos/docker/buildx/releases \
             -H 'Accept: application/json' \
             | jq -r .[].tag_name \
             | sort -Vr \
