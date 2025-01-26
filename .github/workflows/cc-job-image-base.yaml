@@ -89,11 +89,11 @@ jobs:
 
       - name: Update Dockerfile
         run: |
-          sed -i "s/DOCKER_VERSION=.*/DOCKER_VERSION=${{ steps.get_docker_version.outputs.docker_version }}/" Dockerfile.job-image-base
-          sed -i "s/DOCKER_BUILDX_VERSION=.*/DOCKER_BUILDX_VERSION=${{ steps.get_buildx_version.outputs.buildx_version }}/" Dockerfile.job-image-base
+          sed -i "s/DOCKER_VERSION=.*/DOCKER_VERSION=$docker_version/" Dockerfile.job-image-base
+          sed -i "s/DOCKER_BUILDX_VERSION=.*/DOCKER_BUILDX_VERSION=$buildx_version/" Dockerfile.job-image-base
           git add Dockerfile.job-image-base
-          git commit -m "Update Dockerfile to use Docker ${{ steps.get_docker_version.outputs.docker_version }} and \
-          Buildx ${{ steps.get_buildx_version.outputs.buildx_version }}"
+          git commit -m "Update Dockerfile to use Docker $docker_version and \
+          Buildx $buildx_version"
           git checkout -b update-dockerfile
           git push origin update-dockerfile --force
 
