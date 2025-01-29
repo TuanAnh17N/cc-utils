@@ -52,7 +52,7 @@ jobs:
           ${{ steps.get_buildx_version.outputs.buildx_version }}/" \
           Dockerfile.job-image-base
     
-      - name: Check for Changesxs
+      - name: Check for Changes
         id: check_changes
         run: |
           if git diff --quiet Dockerfile.job-image-base; then
@@ -73,6 +73,7 @@ jobs:
           git push origin update-dockerfile --force
 
       - name: Create or Update Pull Request
+        if: steps.check_changes.outputs.changes_detected == 'true'
         run: |
           gh pr create \
             -B master \
