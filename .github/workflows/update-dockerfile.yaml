@@ -52,18 +52,18 @@ jobs:
           ${{ steps.get_buildx_version.outputs.buildx_version }}/" \
           Dockerfile.job-image-base
     
-    #   - name: Check for Changes
-    #     id: check_changes
-    #     run: |
-    #       if git diff --quiet Dockerfile.job-image-base; then
-    #         echo "No changes detected. Exiting workflow."
-    #         echo "changes_detected=false" >> $GITHUB_OUTPUT
-    #       else
-    #         echo "Changes detected, proceeding with commit."
-    #         echo "changes_detected=true" >> $GITHUB_OUTPUT
-    #       fi
+      - name: Check for Changes
+        id: check_changes
+        run: |
+          if git diff --quiet Dockerfile.job-image-base; then
+            echo "No changes detected. Exiting workflow."
+            echo "changes_detected=false" >> $GITHUB_OUTPUT
+          else
+            echo "Changes detected, proceeding with commit."
+            echo "changes_detected=true" >> $GITHUB_OUTPUT
+          fi
       - name: Commit and Push Changes
-        #if: steps.check_changes.outputs.changes_detected == 'true'
+        if: steps.check_changes.outputs.changes_detected == 'true'
         run: |
           git add Dockerfile.job-image-base
           git commit -m "Update Dockerfile to use Docker \
@@ -73,7 +73,7 @@ jobs:
           git push origin update-dockerfile --force
 
       - name: Create or Update Pull Request
-        #if: steps.check_changes.outputs.changes_detected == 'true'
+        if: steps.check_changes.outputs.changes_detected == 'true'
         run: |
           gh pr create \
             -B master \
