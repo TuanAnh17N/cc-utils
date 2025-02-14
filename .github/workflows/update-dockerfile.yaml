@@ -76,12 +76,24 @@ jobs:
       - name: Create or Update Pull Request
         if: steps.check_changes.outputs.changes_detected == 'true'
         run: |
-          gh pr create \
-            -B master \
-            -H update-dockerfile \
-            --title "Update Dockerfile with latest Docker and Buildx versions" \
-            --body "Updates the Dockerfile to use the latest versions:
-              - Docker: ${{ steps.get_docker_version.outputs.docker_version }}
-              - Buildx: ${{ steps.get_buildx_version.outputs.buildx_version }}"
+          # Check if a pull request for the branch "update-dockerfile" already exists
+          pr_number=$(gh pr list --head update-dockerfile --state open --json number --jq '.[].number')
+          if [ -n "$pr_number" ]; then
+            echo "Pull Request #$pr_number already exists, updating title and description..."
+            gh pr edit "$pr_number" \
+              --title "Update Dockerfile with latest Docker and Buildx versions" \
+              --body "Updates the Dockerfile to use the latest versions:
+                - Docker: ${{ steps.get_docker_version.outputs.docker_version }}
+                - Buildx: ${{ steps.get_buildx_version.outputs.buildx_version }}"
+          else
+            echo "No existing Pull Request found, creating a new one..."
+            gh pr create \
+              -B master \
+              -H update-dockerfile \
+              --title "Update Dockerfile with latest Docker and Buildx versions" \
+              --body "Updates the Dockerfile to use the latest versions:
+                - Docker: ${{ steps.get_docker_version.outputs.docker_version }}
+                - Buildx: ${{ steps.get_buildx_version.outputs.buildx_version }}"
+          fi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
