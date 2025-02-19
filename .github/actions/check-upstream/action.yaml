@@ -1,5 +1,4 @@
 name: Check Upstream
-description: Checks if the repository is upstream (not a fork) using bash.
 inputs:
   token:
     description: GitHub token to query the API
@@ -10,6 +9,7 @@ outputs:
 runs:
   using: composite
   steps:
+    - name: Check if repository is upstream
       shell: bash
       run: |
         # Query the GitHub API for repository data
