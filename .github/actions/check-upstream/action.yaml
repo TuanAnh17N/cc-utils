@@ -13,8 +13,10 @@ runs:
       shell: bash
       run: |
         # Query the GitHub API for repository data and extract the "fork" field
-        is_fork=$(curl -sL -H "Authorization: Bearer ${{ inputs.token }}" \
-        "https://api.github.com/repos/${{ github.repository }}" | jq -r .fork)
+        is_fork=$(
+          curl -sL -H "Authorization: Bearer ${{ inputs.token }}" \
+          https://api.github.com/repos/${{ github.repository }} | jq -r .fork
+        )
         echo "repo is a fork: ${is_fork}"
         if [ "${is_fork}" = "true" ]; then
           echo "Repository is a fork. Not upstream."
