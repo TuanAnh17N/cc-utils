@@ -1,0 +1,28 @@
+name: Check Upstream
+description: Checks if the repository is upstream (not a fork) using bash.
+inputs:
+  token:
+    description: GitHub token to query the API
+    required: true
+outputs:
+  is_upstream:
+    description: true if repository is upstream, false otherwise
+runs:
+  using: composite
+  steps:
+      shell: bash
+      run: |
+        # Query the GitHub API for repository data
+        is_fork=$(
+          curl -sL -H 'Authorization: Bearer ${{ inputs.token }}' \
+          https://api.github.com/repos/${{ github.repository }}) \
+          | jq .fork
+        )
+        echo "repo is a fork: ${is_fork}"
+        if [ "${is_fork}" = true ]; then
+          echo "Repository is a fork. Not upstream."
+          echo "is_upstream=false" >> $GITHUB_OUTPUT
+        else
+          echo "Repository is upstream."
+          echo "is_upstream=true" >> $GITHUB_OUTPUT
+        fi
