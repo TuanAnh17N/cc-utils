@@ -21,7 +21,8 @@ runs:
       run: |
         # Query the GitHub API for repository data
         repo_json=$(
-          curl -sL -H 'Authorization: Bearer ${{ inputs.gh-token }}' \
+          curl -sL \
+          -H 'Authorization: Bearer ${{ inputs.gh-token }}' \
           https://api.github.com/repos/${{ github.repository }}
         )
 
