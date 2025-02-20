@@ -20,19 +20,16 @@ runs:
       shell: bash
       run: |
         # Query the GitHub API for repository data
-        repo_json=$(curl -sL -H "Authorization: Bearer ${{ inputs.gh-token }}" "https://api.github.com/repos/${{ github.repository }}")
+        repo_json=$(
+          curl -sL -H 'Authorization: Bearer ${{ inputs.gh-token }}' \
+          https://api.github.com/repos/${{ github.repository }}
+        )
 
-        # Extract attributes using jq
+        # Extract attributes
         fork=$(echo "$repo_json" | jq -r .fork)
         private=$(echo "$repo_json" | jq -r .private)
         default_branch=$(echo "$repo_json" | jq -r .default_branch)
         archived=$(echo "$repo_json" | jq -r .archived)
-
-        # Debug
-        echo "Repository fork status: $fork"
-        echo "Repository privacy status: $private"
-        echo "Default branch: $default_branch"
-        echo "Repository archived: $archived"
 
         # Output
         echo "fork=$fork" >> $GITHUB_OUTPUT
