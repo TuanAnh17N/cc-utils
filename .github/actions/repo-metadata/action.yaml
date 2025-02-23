@@ -6,22 +6,23 @@ inputs:
     required: true
 outputs:
   fork:
-    description: Repository fork status
+    description: Repository fork status (true if fork, false otherwise)
   private:
-    description: Repository privacy status
+    description: Repository privacy status (true if private, false otherwise)
   default-branch:
-    description: Default branch of the repository
+    description: Default branch of the repository (branch name only, e.g., master)
   archived:
-    description: Repository archived status
+    description: Repository archived status (true if archived, false otherwise)
 runs:
   using: composite
   steps:
     - name: Retrieve repository metadata
       shell: bash
       run: |
+        set -euo pipefail
         # Query the GitHub API for repository data
         repo_json=$(
-          curl -sL \
+          curl -sL --fail \
           -H 'Authorization: Bearer ${{ inputs.gh-token }}' \
           https://api.github.com/repos/${{ github.repository }}
         )
