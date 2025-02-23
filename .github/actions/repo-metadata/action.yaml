@@ -33,6 +33,10 @@ runs:
         default_branch=$(echo "$repo_json" | jq -r .default_branch)
         archived=$(echo "$repo_json" | jq -r .archived)
 
+        echo "repo_json: $repo_json"
+        echo "Extracted fork value: $fork"
+
+
         # Output
         echo "fork=$fork" >> $GITHUB_OUTPUT
         echo "private=$private" >> $GITHUB_OUTPUT
