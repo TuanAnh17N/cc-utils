@@ -6,13 +6,21 @@ inputs:
     required: true
 outputs:
   fork:
-    description: Repository fork status (true if fork, false otherwise)
+    description: |
+      Repository fork status (true if fork, false otherwise)
+    value: ${{ steps.metadata.outputs.fork }}
   private:
-    description: Repository privacy status (true if private, false otherwise)
+    description: |
+      Repository privacy status (true if private, false otherwise)
+    value: ${{ steps.metadata.outputs.private }}
   default-branch:
-    description: Default branch of the repository (branch name only, e.g., master)
+    description: |
+      Default branch of the repository (branch name only, e.g., master)
+    value: ${{ steps.metadata.outputs.default-branch }}
   archived:
-    description: Repository archived status (true if archived, false otherwise)
+    description: |
+      Repository archived status (true if archived, false otherwise)
+    value: ${{ steps.metadata.outputs.archived }}
 runs:
   using: composite
   steps:
@@ -39,8 +47,3 @@ runs:
         echo "private=$private" >> $GITHUB_OUTPUT
         echo "default-branch=$default_branch" >> $GITHUB_OUTPUT
         echo "archived=$archived" >> $GITHUB_OUTPUT
-  outputs:
-    fork: ${{ steps.metadata.outputs.fork }}
-    private: ${{ steps.metadata.outputs.private }}
-    default-branch: ${{ steps.metadata.outputs.default_branch }}
-    archived: ${{ steps.metadata.outputs.archived }}
