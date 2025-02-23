@@ -62,7 +62,7 @@ jobs:
           set -eu
           set -o pipefail
 
-          is_fork=${{ steps.repo-metadata.outputs.fork }}
+          is_fork="${{ steps.repo-metadata.outputs.fork }}"
           echo "repo is a fork: ${is_fork}"
 
           if [ "${is_fork}" == true ]; then
