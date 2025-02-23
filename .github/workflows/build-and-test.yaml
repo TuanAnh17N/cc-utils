@@ -56,12 +56,11 @@ jobs:
         uses: ./.github/actions/repo-metadata
         with:
           gh-token: ${{ secrets.GITHUB_TOKEN }}
-      - name: Debug fork output
-        run: "echo Fork output: ${{ steps.repo-metadata.outputs.fork }}"
       - name: params
         id: params
         run: |
-          set -euo pipefail
+          set -eu
+          set -o pipefail
 
           is_fork=${{ steps.repo-metadata.outputs.fork }}
           echo "repo is a fork: ${is_fork}"
