@@ -39,8 +39,8 @@ runs:
         echo "private=$private" >> $GITHUB_OUTPUT
         echo "default-branch=$default_branch" >> $GITHUB_OUTPUT
         echo "archived=$archived" >> $GITHUB_OUTPUT
-outputs:
-  fork: ${{ steps.metadata.outputs.fork }}
-  private: ${{ steps.metadata.outputs.private }}
-  default-branch: ${{ steps.metadata.outputs.default_branch }}
-  archived: ${{ steps.metadata.outputs.archived }}
+  outputs:
+    fork: ${{ steps.metadata.outputs.fork }}
+    private: ${{ steps.metadata.outputs.private }}
+    default-branch: ${{ steps.metadata.outputs.default_branch }}
+    archived: ${{ steps.metadata.outputs.archived }}
