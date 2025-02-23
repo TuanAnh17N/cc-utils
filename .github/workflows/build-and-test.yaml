@@ -50,6 +50,7 @@ jobs:
       oci_repository: ${{ steps.params.outputs.oci_repository }}
       oci_platforms: ${{ steps.params.outputs.oci_platforms }}
     steps:
+      - uses: actions/checkout@v4
       - name: Retrieve repository metadata
         id: repo-metadata
         uses: ./.github/actions/repo-metadata
