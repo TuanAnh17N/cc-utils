@@ -33,7 +33,7 @@ runs:
         repo_json=$(
           curl -sL --fail \
           -H 'Authorization: Bearer ${{ inputs.gh-token }}' \
-          https://api.github.com/repos/${{ github.repository }}
+          ${{ github.api_url }}/repos/${{ github.repository }}
         )
 
         # Extract attributes
