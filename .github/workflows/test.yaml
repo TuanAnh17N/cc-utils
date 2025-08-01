@@ -1,0 +1,20 @@
+name: Test Interpolation
+
+on:
+  workflow_dispatch:
+    inputs:
+      test-value:
+        type: string
+        default: HelloWorld
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print in Shell
+        run: echo "${{ inputs.test-value }}"
+
+      - name: Print in Python (FAILS)
+        shell: python
+        run: |
+          print("${{ inputs.test-value }}")
