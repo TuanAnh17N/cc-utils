@@ -1,20 +1,39 @@
-name: Test Interpolation
+name: Test Interpolation Failure
 
 on:
   workflow_dispatch:
     inputs:
-      test-value:
-        type: string
-        default: HelloWorld
+      post-process:
+        type: choice
+        default: none
+        options:
+          - component-cli
+          - none
 
 jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - name: Print in Shell
-        run: echo "${{ inputs.test-value }}"
+      - name: ✅ YAML Interpolation works
+        run: echo "post-process = ${{ inputs.post-process }}"
 
-      - name: Print in Python (FAILS)
+      - name: ❌ Python compare with ${{ inputs.post-process }}
         shell: python
         run: |
-          print("${{ inputs.test-value }}")
+          if '${{ inputs.post-process }}' == 'component-cli':
+              print("✅ CONDITION MET")
+          else:
+              print("❌ CONDITION FAILED")
+
+      - name: ✅ Python compare with env variable (works)
+        shell: python
+        env:
+          POST_PROCESS: ${{ inputs.post-process }}
+        run: |
+          import os
+          post_process = os.getenv("POST_PROCESS")
+          print(f"POST_PROCESS={post_process}")
+          if post_process == 'component-cli':
+              print("✅ ENV CONDITION MET")
+          else:
+              print("❌ ENV CONDITION FAILED")
